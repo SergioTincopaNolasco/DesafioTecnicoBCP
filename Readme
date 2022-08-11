@@ -1,1 +1,3 @@
 En el presente repositorio encontrarán la solución al desafío técnico propuesto por BCP. En la carpeta src se encuentran el API y el cliente en angular que consume el API.
+
+Asimismo, el API ha sido testeado desde postman para obtener el token y enviarlo a cada metodo disponible. Adjunto imagenes de las pruebas realizadas.
