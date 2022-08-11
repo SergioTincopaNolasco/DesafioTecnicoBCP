@@ -34,16 +34,27 @@ namespace DesafioTecnicoDocker.Controllers
             TipoCambioResponse response = new TipoCambioResponse();
             response.monto = request.monto;
 
-            decimal tipoCambio = this.ListaTipoCambio().FirstOrDefault(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino).Valor;
+            if (this.ListaTipoCambio().Where(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino).Any())
+            {
+                decimal tipoCambio = this.ListaTipoCambio().FirstOrDefault(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino).Valor;
 
-            response.montoConTipoCambio = request.monto * tipoCambio;
-            response.monedaOrigen = request.monedaOrigen;
-            response.monedaDestino = request.monedaDestino;
-            response.tipoCambio = tipoCambio;
+                response.montoConTipoCambio = request.monto * tipoCambio;
+                response.monedaOrigen = request.monedaOrigen;
+                response.monedaDestino = request.monedaDestino;
+                response.tipoCambio = tipoCambio;
 
-            var data = (List<TipoCambioResponse>)memoryCache.Get("OPERACION");
-            data.Add(response);
-            memoryCache.Set("OPERACION", data);
+                var data = (List<TipoCambioResponse>)memoryCache.Get("OPERACION");
+                data.Add(response);
+                memoryCache.Set("OPERACION", data);
+            }
+            else 
+            {
+                response.montoConTipoCambio = 0;
+                response.monedaOrigen = request.monedaOrigen;
+                response.monedaDestino = request.monedaDestino;
+                response.tipoCambio = 0;
+            }
+            
             return Ok(response);
         }
 
@@ -53,13 +64,20 @@ namespace DesafioTecnicoDocker.Controllers
             bool response = false;
             var data = (List<TipoCambio>)memoryCache.Get("LISTATIPOCAMBIO");
 
-            TipoCambio tipoCambio = data.FirstOrDefault(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino);
+            if (data.Where(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino).Any())
+            {
+                TipoCambio tipoCambio = data.FirstOrDefault(x => x.Origen == request.monedaOrigen && x.Destino == request.monedaDestino);
 
-            tipoCambio.Valor = request.montoTipoCambio;
-            
-            memoryCache.Set("LISTATIPOCAMBIO", data);
+                tipoCambio.Valor = request.montoTipoCambio;
 
-            response = true;
+                memoryCache.Set("LISTATIPOCAMBIO", data);
+
+                response = true;
+            }
+            else 
+            {
+                response = false;
+            }
 
             return Ok(response);
         }
